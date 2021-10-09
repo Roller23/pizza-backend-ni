@@ -4,6 +4,10 @@ const port = process.env.PORT || 3000
 
 const orders = []
 
+function rnd(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -11,7 +15,7 @@ app.get('/', (req, res) => {
   res.write('<h1>Pizza backend</h1>')
   res.write('<h2>Current orders</h2>')
   for (const order of orders) {
-    res.write(`<h3>${order.name} - ${order.price}</h3>`)
+    res.write(`<h3>${order.name} - ${order.price}PLN (${order.status})</h3>`)
   }
   res.end()
 })
@@ -19,19 +23,25 @@ app.get('/', (req, res) => {
 app.post('/api/kitchen', (req, res) => {
   console.log('request', req.body)
   if (req.body.name === undefined) {
-    return res.json({error: 'Brak rodzaju pizzy'})
+    return res.json({error: 'Pizza name cannot be empty'})
   }
   if (req.body.amount === undefined) {
-    return res.json({error: 'Brak ilości pizzy'})
+    return res.json({error: 'Pizza amount cannot be empty'})
   }
-  const amount = Number(req.body.amount)
+  const amount = Math.floor(Number(req.body.amount))
   if (isNaN(amount)) {
-    return res.json({error: 'Niewłaściwa ilość pizzy'})
+    return res.json({error: 'Incorrect pizza amount'})
   }
+  const waitTime = rnd(1, 5) * amount
   const price = Math.floor(Math.random() * 10 * amount)
   const order = {name: req.body.name, amount, price}
+  const orderRes = {...order}
+  order.status = 'Baking...'
   orders.push(order)
-  res.json(order)
+  setTimeout(() => {
+    order.status = 'Done!'
+    res.json(orderRes)
+  }, waitTime * 1000)
 })
 
 app.listen(port, () => {
