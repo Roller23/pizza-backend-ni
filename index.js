@@ -16,13 +16,14 @@ app.get('/', (req, res) => {
   res.write('<h2>Current orders</h2>')
   let i = 0;
   for (const order of orders) {
-    res.write(`<h3>${order.name} - ${order.price}PLN (${order.status}... <span class="time" id="time-${i}">${order.time}</span>s left)</h3>`)
+    res.write(`<h3>${order.name} - ${order.price}PLN <span class="status">(${order.status}... <span class="time" id="time-${i}">${order.time}</span>s left)</span></h3>`)
     i++;
   }
   res.write(`
     <script>
-      let times = document.querySelectorAll('.time')
-      times.forEach(time => {
+      let statuses = document.querySelectorAll('.status')
+      statuses.forEach(status => {
+        let time = status.querySelector('.time')
         let timeInt = Number(time.innerText)
         let interval = setInterval(() => {
             if (timeInt > 0) {
@@ -30,6 +31,7 @@ app.get('/', (req, res) => {
                 time.innerText = timeInt
             } else {
               clearInterval(interval)
+              status.innerText = '(Done!)'
             }
         }, 1000)
       })
