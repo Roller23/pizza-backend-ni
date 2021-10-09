@@ -65,6 +65,7 @@ app.post('/api/kitchen', (req, res) => {
   setTimeout(() => {
     order.status = 'Done!'
     clearInterval(interval)
+    order.time = 0
     res.json(orderRes)
   }, waitTime * 1000)
 })
