@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
         let time = status.querySelector('.time')
         let timeInt = Number(time.innerText)
         let interval = setInterval(() => {
-            if (timeInt > 0) {
+            if (timeInt > 1) {
                 timeInt--
                 time.innerText = timeInt
             } else {
