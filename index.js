@@ -14,9 +14,27 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.write('<h1>Pizza backend</h1>')
   res.write('<h2>Current orders</h2>')
+  let i = 0;
   for (const order of orders) {
-    res.write(`<h3>${order.name} - ${order.price}PLN (${order.status})</h3>`)
+    res.write(`<h3>${order.name} - ${order.price}PLN (${order.status}... <span class="time" id="time-${i}">${order.time}</span>s left)</h3>`)
+    i++;
   }
+  res.write(`
+    <script>
+      let times = document.querySelectorAll('.time')
+      times.forEach(time => {
+        let timeInt = Number(time.innerText)
+        let interval = setInterval(() => {
+            if (timeInt > 0) {
+                timeInt--
+                time.innerText = timeInt
+            } else {
+              clearInterval(interval)
+            }
+        }, 1000)
+      })
+    </script>
+  `)
   res.end()
 })
 
@@ -37,9 +55,16 @@ app.post('/api/kitchen', (req, res) => {
   const order = {name: req.body.name, amount, price}
   const orderRes = {...order}
   order.status = 'Baking...'
+  order.time = waitTime
   orders.push(order)
+  let interval = setInterval(() => {
+    if (order.time > 0) {
+      order.time--
+    }
+  }, 1000)
   setTimeout(() => {
     order.status = 'Done!'
+    clearInterval(interval)
     res.json(orderRes)
   }, waitTime * 1000)
 })
